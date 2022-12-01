@@ -15,4 +15,4 @@ foreach (string line in File.ReadLines(args[0]))
 }
 
 Console.WriteLine($"Puzzle 1 answer: {cals.Max()}.");
-Console.WriteLine($"Puzzle 2 answer:  {cals.OrderByDescending(c => c).Take(3).Sum()}.");
+Console.WriteLine($"Puzzle 2 answer: {cals.OrderByDescending(c => c).Take(3).Sum()}.");
