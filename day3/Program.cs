@@ -6,7 +6,7 @@
     var second = items
         .AsSpan()
         .Slice(items.Length / 2);
-        
+
     foreach (char itemFirst in first)
     {
         if (second.Contains(itemFirst))
@@ -56,4 +56,5 @@ for (int groupIndex = 0; groupIndex < rucksacks.Length / 3; groupIndex++)
         rucksacks[groupIndex * 3 + 1],
         rucksacks[groupIndex * 3 + 2]));
 }
+
 Console.WriteLine($"Puzzle 2 answer: {prioritySum}");
