@@ -1,4 +1,6 @@
-﻿IEnumerable<(int, int, int, int)> GetSectionPairs()
+﻿// https://adventofcode.com/2022/day/4
+
+IEnumerable<(int, int, int, int)> GetSectionPairs()
 {
     foreach(string line in File.ReadLines(args[0]))
     {

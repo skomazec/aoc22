@@ -1,4 +1,6 @@
-﻿const int Shape_Rock = 1;
+﻿// https://adventofcode.com/2022/day/2
+
+const int Shape_Rock = 1;
 const int Shape_Paper = 2;
 const int Shape_Scissors = 3;
 

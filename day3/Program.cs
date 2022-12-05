@@ -1,4 +1,6 @@
-﻿char FindDuplicatedItem(string items)
+﻿// https://adventofcode.com/2022/day/3
+
+char FindDuplicatedItem(string items)
 {
     var first = items
         .AsSpan()

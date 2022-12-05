@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿// https://adventofcode.com/2022/day/5
+
+using System.Linq;
 
 Stack<char>[] GetInputStacks()
 {

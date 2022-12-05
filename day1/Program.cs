@@ -1,4 +1,6 @@
-﻿int calSum = 0;
+﻿// https://adventofcode.com/2022/day/1
+
+int calSum = 0;
 var cals = new List<int>();
 
 foreach (string line in File.ReadLines(args[0]))
