@@ -69,7 +69,6 @@ stacks = GetInputStacks();
 var tempStack = new Stack<char>();
 foreach (var (Count, From, To) in moves)
 {
-    tempStack.Clear();
     for (int i = 0 ; i < Count; i++)
     {
         tempStack.Push(stacks[From - 1].Pop());
@@ -78,5 +77,6 @@ foreach (var (Count, From, To) in moves)
     {
         stacks[To -1].Push(tempStack.Pop());
     }
+    tempStack.Clear();
 }
 Console.WriteLine($"Puzzle 2 solution is : {string.Concat(stacks.Select(s => s.Peek()))}");
