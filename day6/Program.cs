@@ -8,8 +8,7 @@ int DetectDistinct(int bufferLength)
     using var reader = new StreamReader(args[0]);
     while(!reader.EndOfStream)
     {
-        int current = reader.Read();
-        buffer[i % bufferLength] = current;
+        buffer[i % bufferLength] = reader.Read();
         if (i > 3 && buffer.Distinct().Count() == bufferLength)
         {
             break;
