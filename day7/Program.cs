@@ -1,7 +1,7 @@
 ﻿// https://adventofcode.com/2022/day/7
 
 var rootNode = ParseInput(args[0]);
-var dirs = Flatten(rootNode);
+var dirs = FlattenDirs(rootNode);
 
 var solution1 = dirs
     .Where(d => d.TotalSize <= 100000)
@@ -64,29 +64,29 @@ DirNode ParseInput(string inputFileName)
     return rootNode;
 }
 
-IList<DirNode> Flatten(DirNode node)
+IList<DirNode> FlattenDirs(DirNode node)
 {
     List<DirNode> result = new() {node};
     foreach(var item in node.Items!)
     {
         if (item is DirNode itemDirNode)
-            result.AddRange(Flatten(itemDirNode));
+            result.AddRange(FlattenDirs(itemDirNode));
     }
     return result;
 }
 
-public abstract record Node(string Name, DirNode? Parent)
+abstract record Node(string Name, DirNode? Parent)
 {
     public abstract int TotalSize { get; }
 }
 
-public record DirNode(string Name, DirNode? Parent, List<Node> Items)
+record DirNode(string Name, DirNode? Parent, List<Node> Items)
     : Node(Name, Parent)
 {
     public override int TotalSize => Items.Sum(c => c.TotalSize);
 }
 
-public record FileNode(string Name, DirNode? Parent, int Size)
+record FileNode(string Name, DirNode? Parent, int Size)
     : Node(Name, Parent)
 {
     public override int TotalSize => Size;
