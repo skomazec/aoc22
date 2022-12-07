@@ -86,7 +86,6 @@ IEnumerable<Node> Flatten(Node node)
 public enum NodeType
 {
     File,
-
     Dir
 }
 
