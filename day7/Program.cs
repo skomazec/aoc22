@@ -4,27 +4,25 @@ var rootNode = ParseInput(args[0]);
 var dirs = Flatten(rootNode);
 
 var solution1 = dirs
-    .Where(d => d.Size <= 100000)
-    .Select(d => d.Size)
+    .Where(d => d.TotalSize <= 100000)
+    .Select(d => d.TotalSize)
     .Sum();
 
 Console.WriteLine($"Solution to Puzzle 1 : {solution1}");
 
 var solution2 = dirs
-    .OrderBy(d => d.Size)
-    .First(d => d.Size + 70000000 - rootNode.Size > 30000000)
-    .Size;
+    .OrderBy(d => d.TotalSize)
+    .First(d => d.TotalSize + 70000000 - rootNode.TotalSize > 30000000)
+    .TotalSize;
 
 Console.WriteLine($"Solution to Puzzle 2 : {solution2}");
 
 Node ParseInput(string inputFileName)
 {
-    Node rootNode = new(NodeType.Dir, "/", null);
+    Node rootNode = new(NodeType: NodeType.Dir, Name: "/", Parent: null, Size: null, Items: new());
     Node currentNode = rootNode;
 
-    var lines = File
-        .ReadLines(inputFileName)
-        .ToArray();
+    var lines = File.ReadLines(inputFileName).ToArray();
 
     int i = 0;
     while(i != lines.Length - 1)
@@ -36,9 +34,7 @@ Node ParseInput(string inputFileName)
             {
                 "/" => rootNode,
                 ".." => currentNode.Parent ?? throw new Exception("No parent node."),
-                _ => currentNode
-                        .Items!
-                        .First(n => n.Name == arg)
+                _ => currentNode.Items!.First(n => n.Name == arg)
             };
             i++;
         }
@@ -51,14 +47,14 @@ Node ParseInput(string inputFileName)
                 {
                     currentNode
                         .Items!
-                        .Add(new(NodeType.Dir, lines[i].Substring(4), currentNode));
+                        .Add(new(NodeType: NodeType.Dir, Name: lines[i].Substring(4), Parent: currentNode, Size: null, Items: new()));
                 }
                 else
                 {
                     var info = lines[i].Split(" ");
                     currentNode
                         .Items!
-                        .Add(new(NodeType.File, info[1], currentNode, int.Parse(info[0])));
+                        .Add(new(NodeType: NodeType.File, Name: info[1], Parent: currentNode, Size: int.Parse(info[0]), Items: null));
                 }
             }
         }
@@ -69,16 +65,14 @@ Node ParseInput(string inputFileName)
 IEnumerable<Node> Flatten(Node node)
 {
     List<Node> result = new();
-    if (node.NodeType == NodeType.Dir)
+    if (node.NodeType == NodeType.File)
+        return result;
+
+    result.Add(node);
+    foreach(var item in node.Items!)
     {
-        result.Add(node);
-        foreach(var item in node.Items!)
-        {
-            if (item.NodeType == NodeType.Dir)
-            {
-                result.AddRange(Flatten(item));
-            }
-        }
+        if (item.NodeType == NodeType.Dir)
+            result.AddRange(Flatten(item));
     }
     return result;
 }
@@ -89,40 +83,13 @@ public enum NodeType
     Dir
 }
 
-public class Node
+public record Node(NodeType NodeType, string Name, Node? Parent, int? Size, List<Node>? Items)
 {
-    public Node(NodeType nodeType, string name, Node? parent, int? size = default)
-    {
-        NodeType = nodeType;
-        Name = name;
-        Parent = parent;
-        this.size = size;
-
-        if (nodeType == NodeType.Dir)
+    public int TotalSize 
+        => NodeType switch
         {
-            Items = new();
-        }
-
-        if (nodeType == NodeType.File && size == default)
-        {
-            throw new ArgumentException(nameof(size));
-        }
-    }
-
-    private int? size;
-
-    public NodeType NodeType { get; }
-
-    public string Name { get; }
-
-    public Node? Parent { get; }
-
-    public List<Node>? Items { get; }
-
-    public int Size => NodeType switch
-    {
-        NodeType.File => size!.Value,
-        NodeType.Dir => Items!.Sum(c => c.Size),
-        _ => throw new NotImplementedException()
-    };
+            NodeType.File => Size!.Value,
+            NodeType.Dir => Items!.Sum(c => c.TotalSize),
+            _ => throw new NotImplementedException()
+        };
 }
