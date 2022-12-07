@@ -17,12 +17,14 @@ var solution2 = dirs
 
 Console.WriteLine($"Solution to Puzzle 2 : {solution2}");
 
-Node ParseInput(string inputFileName)
+DirNode ParseInput(string inputFileName)
 {
-    Node rootNode = new(NodeType: NodeType.Dir, Name: "/", Parent: null, Size: null, Items: new());
-    Node currentNode = rootNode;
+    DirNode rootNode = new(Name: "/", Parent: null, Items: new());
+    DirNode currentNode = rootNode;
 
-    var lines = File.ReadLines(inputFileName).ToArray();
+    var lines = File
+        .ReadLines(inputFileName)
+        .ToArray();
 
     int i = 0;
     while(i != lines.Length - 1)
@@ -34,7 +36,7 @@ Node ParseInput(string inputFileName)
             {
                 "/" => rootNode,
                 ".." => currentNode.Parent ?? throw new Exception("No parent node."),
-                _ => currentNode.Items!.First(n => n.Name == arg)
+                _ => (DirNode)currentNode.Items.First(n => n.Name == arg)
             };
             i++;
         }
@@ -46,15 +48,15 @@ Node ParseInput(string inputFileName)
                 if (lines[i].StartsWith("dir"))
                 {
                     currentNode
-                        .Items!
-                        .Add(new(NodeType: NodeType.Dir, Name: lines[i].Substring(4), Parent: currentNode, Size: null, Items: new()));
+                        .Items
+                        .Add(new DirNode(Name: lines[i].Substring(4), Parent: currentNode, Items: new()));
                 }
                 else
                 {
                     var info = lines[i].Split(" ");
                     currentNode
-                        .Items!
-                        .Add(new(NodeType: NodeType.File, Name: info[1], Parent: currentNode, Size: int.Parse(info[0]), Items: null));
+                        .Items
+                        .Add(new FileNode(Name: info[1], Parent: currentNode, Size: int.Parse(info[0])));
                 }
             }
         }
@@ -62,34 +64,30 @@ Node ParseInput(string inputFileName)
     return rootNode;
 }
 
-IEnumerable<Node> Flatten(Node node)
+IList<DirNode> Flatten(DirNode node)
 {
-    List<Node> result = new();
-    if (node.NodeType == NodeType.File)
-        return result;
-
-    result.Add(node);
+    List<DirNode> result = new() {node};
     foreach(var item in node.Items!)
     {
-        if (item.NodeType == NodeType.Dir)
-            result.AddRange(Flatten(item));
+        if (item is DirNode itemDirNode)
+            result.AddRange(Flatten(itemDirNode));
     }
     return result;
 }
 
-public enum NodeType
+public abstract record Node(string Name, DirNode? Parent)
 {
-    File,
-    Dir
+    public abstract int TotalSize { get; }
 }
 
-public record Node(NodeType NodeType, string Name, Node? Parent, int? Size, List<Node>? Items)
+public record DirNode(string Name, DirNode? Parent, List<Node> Items)
+    : Node(Name, Parent)
 {
-    public int TotalSize 
-        => NodeType switch
-        {
-            NodeType.File => Size!.Value,
-            NodeType.Dir => Items!.Sum(c => c.TotalSize),
-            _ => throw new NotImplementedException()
-        };
+    public override int TotalSize => Items.Sum(c => c.TotalSize);
+}
+
+public record FileNode(string Name, DirNode? Parent, int Size)
+    : Node(Name, Parent)
+{
+    public override int TotalSize => Size;
 }
