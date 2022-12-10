@@ -42,18 +42,15 @@ IEnumerable<(int Cycle, int Reg)> ExecuteOps(int initReg, IEnumerable<Op> ops)
                 
                 cycle++;
                 yield return (cycle, reg);
-                
                 break;
 
             case AddX addX:
                 
                 cycle++;
                 yield return (cycle, reg);
-
                 cycle++;
                 yield return (cycle, reg);
                 reg += addX.Value;
-
                 break;
         }
     }
